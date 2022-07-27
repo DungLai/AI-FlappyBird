@@ -11,22 +11,27 @@ BLUE =  (  0,   0, 255)
 GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
 SAND = (255,255,100)
+YELLOW = (255,255,0)
+ORANGE = (255,255,127)
 
-FPS = 120
+FPS = 100
 
-GRAVITY = 0.22
+GRAVITY = 0.5
+sand_img = pg.image.load("images/sand.png")
 SAND_HEIGHT = 50
 
-JUMP_VELOCITY = -7
-TUBE_VELOCITY = -1
+tube_img = pg.image.load("images/tube.png")
+JUMP_VELOCITY = -10
+TUBE_VELOCITY = -3
 TUBE_WIDTH = 100
+TUBE_HEIGHT = 480
 SKY_WIDTH = 5
 TUBE_GAP = 150
 
-bird_img = pg.image.load("images/bird1.png")
+bird_img = pg.image.load("images/bird.png")
 BIRD_SIZE = bird_img.get_size()
 
-POPULATION = 50
+POPULATION = 100
 
 INPUT_LAYER = 5
 HIDDEN_LAYER = 4
