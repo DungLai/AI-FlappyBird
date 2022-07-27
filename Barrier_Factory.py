@@ -29,11 +29,6 @@ class Barrier_Factory:
             if type(sky) is self.dict["Sky"]:
                 return sky
 
-        if barrier_name == "Ground":
-            ground = Ground(0,HEIGHT-SAND_HEIGHT,WIDTH,SAND_HEIGHT)
-            if type(ground) is self.dict["Ground"]:
-                return ground
-
         if barrier_name == "Tube":
             TUBE_Y = random.randint(20,HEIGHT - SAND_HEIGHT - TUBE_GAP - 20)-TUBE_HEIGHT
             #TUBE_HEIGHT = self.__list_tube_height[self.index]
@@ -43,5 +38,10 @@ class Barrier_Factory:
             # HEIGHT - SAND_HEIGHT - (TUBE_HEIGHT + TUBE_GAP)
             if type(tubeTop) and type(tubeBottom) is self.dict["Tube"]:
                 return tubeTop, tubeBottom
+
+        if barrier_name == "Ground":
+            ground = Ground(0,HEIGHT-SAND_HEIGHT,WIDTH,SAND_HEIGHT)
+            if type(ground) is self.dict["Ground"]:
+                return ground
 
         raise NameError("Wrong factory format")
