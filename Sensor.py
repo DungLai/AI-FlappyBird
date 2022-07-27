@@ -9,7 +9,8 @@ class Sensor:
 
     def detect(self, bird, tube_top, tube_bottom):
         self.dist_horizontal = tube_bottom.rect.x + TUBE_WIDTH - bird.rect.center[0]
-        self.dist_vertical = ((tube_bottom.rect.y - tube_top.height)/2 + tube_top.height) - bird.rect.center[1]
+        true_tubetop_height = tube_top.height + tube_top.rect.y
+        self.dist_vertical = ((tube_bottom.rect.y - true_tubetop_height)/2 + true_tubetop_height) - bird.rect.center[1]
 
     # def draw(self):
     #     pass
