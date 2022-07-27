@@ -15,7 +15,7 @@ class Barrier_Factory:
 
         self.count = 0
 
-        tube = Tube(0,0,0,0)
+        tube = Tube(0,0,0,0,0)
         sky = Sky(0,0,0,0)
         ground = Ground(0,0,0,0)
 
@@ -35,13 +35,12 @@ class Barrier_Factory:
                 return ground
 
         if barrier_name == "Tube":
-            TUBE_HEIGHT = random.randint(20,HEIGHT - SAND_HEIGHT - TUBE_GAP - 20)
+            TUBE_Y = random.randint(20,HEIGHT - SAND_HEIGHT - TUBE_GAP - 20)-TUBE_HEIGHT
             #TUBE_HEIGHT = self.__list_tube_height[self.index]
             self.index += 1
-
-            tubeTop = Tube(WIDTH, 0, TUBE_WIDTH, TUBE_HEIGHT)
-            tubeBottom = Tube(WIDTH, TUBE_HEIGHT + TUBE_GAP, TUBE_WIDTH, HEIGHT - SAND_HEIGHT - (TUBE_HEIGHT + TUBE_GAP))
-
+            tubeTop = Tube(WIDTH, TUBE_Y, TUBE_WIDTH, TUBE_HEIGHT, 1)
+            tubeBottom = Tube(WIDTH, TUBE_Y + TUBE_HEIGHT + TUBE_GAP, TUBE_WIDTH,TUBE_HEIGHT , 0)
+            # HEIGHT - SAND_HEIGHT - (TUBE_HEIGHT + TUBE_GAP)
             if type(tubeTop) and type(tubeBottom) is self.dict["Tube"]:
                 return tubeTop, tubeBottom
 
