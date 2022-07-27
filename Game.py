@@ -12,7 +12,6 @@ class Game:
         self.screen = pg.display.set_mode((WIDTH,HEIGHT))
         self.screen.set_alpha(None)
         self.clock = pg.time.Clock()
-
         self.generation = 0
         self.generation_list = []
 
@@ -42,6 +41,7 @@ class Game:
         self.generation_list.append(self.generation)
 
         #region Collect data
+        print("Literations: ",self.generation+1)
         print(self.average_fitness_list)
         print(self.best_fitness_list)
         print(self.generation_list)
@@ -81,12 +81,10 @@ class Game:
         if len(self.all_birds) != 0: #update best __score__:
             self.__display_text__("Best score: " + str(self.__score__),10, 10, 20, BLACK)
 
-        if self.tubeBottom.rect.x == WIDTH/2 - TUBE_WIDTH - BIRD_SIZE[0]: #increase score if bird pass through a tube
+        if self.tubeBottom.rect.x <= WIDTH/2 - TUBE_WIDTH - BIRD_SIZE[0]: #increase score if bird pass through a tube
             self.tubeTop, self.tubeBottom = self.barrier_factory.generate("Tube")
-
             self.all_barrier.add(self.tubeBottom)
             self.all_barrier.add(self.tubeTop)
-
             self.all_sprites.add(self.all_barrier)
 
         #feed forward NN of each bird
@@ -131,6 +129,17 @@ class Game:
         #print ("all barrier: " +str(len(self.all_barrier)))
 
         self.screen.blit(Background, [0, 0])
+        for bird in self.__bird_list__:
+            if bird.live == 1:
+                pg.draw.line(self.screen, YELLOW,
+                             (bird.rect.center[0], bird.rect.center[1]), (
+                             bird.rect.center[0] + bird.sensor.dist_horizontal,
+                             bird.rect.center[1]),3)
+                pg.draw.line(self.screen, ORANGE,
+                             (bird.rect.center[0], bird.rect.center[1]), (
+                             bird.rect.center[0],
+                             bird.rect.center[1] + bird.sensor.dist_vertical),3)
+                break
 
         for bird in self.all_birds: #Use blit instead of draw to have better speed
             self.screen.blit(bird.image, [bird.rect.x,bird.rect.y])
@@ -139,12 +148,13 @@ class Game:
             self.screen.blit(barrier.image, [barrier.rect.x, barrier.rect.y])
 
         if len(self.all_birds) != 0: #update best __score__:
-            self.__display_text__("Best score: " + str(self.__score__),10, 10, 20, BLACK)
-
-        if self.__bird_list__[0].live == 1: # draw two line from bird with data from bird.sensor
-            pg.draw.line(self.screen, BLACK, (self.__bird_list__[0].rect.center[0], self.__bird_list__[0].rect.center[1]), (self.__bird_list__[0].rect.center[0] + self.__bird_list__[0].sensor.dist_horizontal, self.__bird_list__[0].rect.center[1]))
-            pg.draw.line(self.screen, BLACK, (self.__bird_list__[0].rect.center[0], self.__bird_list__[0].rect.center[1]), (self.__bird_list__[0].rect.center[0] , self.__bird_list__[0].rect.center[1] + self.__bird_list__[0].sensor.dist_vertical))
-
+            count_bird_alive = 0
+            for bird in self.__bird_list__:
+                if bird.live==1:
+                    count_bird_alive+=1
+            self.__display_text__("Best score: " + str(self.__score__),75, 10, 30, WHITE)
+            self.__display_text__("Literations: " + str(self.generation),75, 30, 30, WHITE)
+            self.__display_text__("Birds alive: " + str(count_bird_alive), 75, 50, 30, WHITE)
         pg.display.flip()
 
 
@@ -157,18 +167,19 @@ class Game:
 
     def start_screen(self):
         self.__game_playing__ = False
+        pg.display.set_caption("Flappy Bird AI")
         while not self.__game_playing__:
-            self.__display_text__("Flappy Bird",WIDTH / 3, HEIGHT / 3, 30, WHITE)
-            self.__display_text__("Press S to Start...",WIDTH/3, HEIGHT / 2, 30, WHITE)
+            self.__display_text__("Flappy Bird",WIDTH / 3 + 20, HEIGHT / 3, 30, WHITE)
+            self.__display_text__("Press Enter to Start...",WIDTH/3, HEIGHT / 2, 30, WHITE)
             pg.display.flip()
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     raise SystemExit ## Exit game
 
-                if event.type == pg.KEYDOWN and event.key == pg.K_s: #press S to start game
+                if event.type == pg.KEYDOWN and event.key == pg.K_RETURN: #press enter to start game
                     self.__game_playing__ = True
 
     def __display_text__(self, message, x, y, size, color):
-        font = pg.font.SysFont("Comic Sans Ms", size)
+        font = pg.font.SysFont("GeeksForGeeks", size)
         text = font.render(message, False, color)
         self.screen.blit(text, (x,y))
