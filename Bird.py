@@ -6,7 +6,7 @@ vec2 = pg.math.Vector2
 class Bird(pg.sprite.Sprite):
     def __init__(self, genome = None):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load("images/bird1.png")
+        self.image = bird_img
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH/2, random.randint(15,HEIGHT-SAND_HEIGHT)-5)
 
