@@ -8,7 +8,8 @@ class Game:
         self.barrier_factory = Barrier_Factory()
         self.__game_running__ = True  # whole game, to configure quit command
         self.__game_playing__ = False  # bird jumping -> true. Instruction screen -> false
-        self.__score__ = 0  # best score
+        self.__score__ = 0
+        self.__maxscore__ = 0  # best score
         self.__bird_list__ = [Bird() for i in range(POPULATION)]  # all bird in a population
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.screen.set_alpha(None)
@@ -79,21 +80,29 @@ class Game:
         # endregion
 
     def update(self):
-        self.__score__ = self.barrier_factory.count - 3
+        self.__score__ = self.barrier_factory.count - 1
         if len(self.all_birds) != 0:  # update best __score__:
-            self.__display_text__("Best score: " + str(self.__score__), 10, 10, 20, BLACK)
+            self.__display_text__("Best score: " + str(self.__score__), 10, 10, 20, WHITE)
 
-        if self.tubeBottom.rect.x <= WIDTH / 2 - TUBE_WIDTH - BIRD_SIZE[
-            0]:  # increase score if bird pass through a tube
+
+        if self.tubeBottom.rect.x <= WIDTH / 2 - TUBE_WIDTH - BIRD_SIZE[0]:  # increase score if bird pass through a tube
+            self.all_barrier.remove()
             self.tubeTop, self.tubeBottom = self.barrier_factory.generate("Tube")
-            self.ground = self.barrier_factory.generate("Ground")
             self.all_barrier.add(self.tubeBottom)
             self.all_barrier.add(self.tubeTop)
-            self.all_barrier.add(self.ground)
+            self.all_barrier.add(self.barrier_factory.generate("Ground"))
+            self.ground.kill()
+            for sprite in self.all_sprites:
+                if isinstance(sprite,Ground):
+                    sprite.kill()
             self.all_sprites.add(self.all_barrier)
 
         # feed forward NN of each bird
         for bird in self.all_birds:
+            if bird.rect.y <= 1 or bird.rect.y >= HEIGHT - SAND_HEIGHT:
+                bird.live = 0
+                self.all_birds.remove(bird)
+                self.all_sprites.remove(bird)
             bird.sensor.detect(bird, self.tubeTop, self.tubeBottom)
             output_NN = bird.ANN.feed_forward(np.array([[bird.sensor.dist_vertical],
                                                         [bird.sensor.dist_horizontal],
@@ -102,7 +111,6 @@ class Game:
                                                         [BIRD_SIZE[1]]]))
             if output_NN > THRESHOLD:
                 bird.flap()
-
         self.all_sprites.update()
 
     def events(self):
@@ -128,7 +136,7 @@ class Game:
             self.__game_playing__ = False
 
     def draw(self):
-
+        # print(sum(isinstance(x, Ground) for x in self.all_sprites))
         # print ("all_birds: " + str(len(self.all_birds)))
         # print ("all sprites: " + str(len(self.all_sprites)))
         # print ("all barrier: " +str(len(self.all_barrier)))
@@ -161,7 +169,10 @@ class Game:
             for bird in self.__bird_list__:
                 if bird.live == 1:
                     count_bird_alive += 1
-            self.__display_text__("Best score: " + str(self.__score__), 75, 10, 30, WHITE)
+            if self.__score__ >= self.__maxscore__:
+                self.__maxscore__ = self.__score__
+            self.__display_text__("Best score: " + str(self.__maxscore__) + " (" + str(self.__score__) + ") ", 75, 10,
+                                  30, WHITE)
             self.__display_text__("Literations: " + str(self.generation), 75, 30, 30, WHITE)
             self.__display_text__("Birds alive: " + str(count_bird_alive), 75, 50, 30, WHITE)
         pg.display.flip()
@@ -174,7 +185,7 @@ class Game:
             self.draw()
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    self.__game_playing__=False
+                    self.__game_playing__ = False
                     raise SystemExit  ## Exit game
 
     def start_screen(self):
